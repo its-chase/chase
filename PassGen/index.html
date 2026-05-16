@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chase Password Generator</title>
+    <link rel="icon" type="image/png" href="favicon.jpg" sizes="24x24">
+    <style>
+        :root {
+            --primary-red: #e53935;
+            --dark-blue: #0a3d62;
+            --bg-azure: #f0ffff;
+            --success-green: #3e5f1b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: snow;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Video background styling */
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        /* Password Display Box */
+        .result-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            min-height: 30px;
+            font-weight: bold;
+            color: var(--dark-blue);
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .result-container:hover {
+            background-color: #fafafa;
+            border-color: #ccc;
+        }
+
+        .result-container::after {
+            content: 'Click to Copy';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #888;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .result-container:hover::after {
+            opacity: 1;
+        }
+
+        .setting-title {
+            color: var(--dark-blue);
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        input[type=range] {
+            flex-grow: 1;
+            accent-color: #3e5f1b;
+            cursor: pointer;
+        }
+
+        .length-val {
+            font-weight: bold;
+            color: var(--dark-blue);
+            margin-top: 10px;
+            display: block;
+        }
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 40px 0;
+    text-align: right;
+    align-items: center; /* Vertically align grid items */
+}
+
+.option {
+    display: flex;
+    justify-content: space-between; /* Push label to left and checkbox to right */
+    align-items: center;
+}
+
+.option span {
+    text-align: left; /* Ensure label text is left-aligned */
+}
+
+.checkbox-wrapper-12 {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px; /* optional spacing */
+}
+
+.checkbox-wrapper-12 > svg {
+    position: absolute;
+    top: -130%;
+    left: -170%;
+    width: 110px;
+    pointer-events: none;
+}
+
+/* Rest of your checkbox styling remains the same */
+
+
+/* Style the input checkbox */
+.checkbox-wrapper-12 input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #bfbfc0;
+  border-radius: 50%;
+  position: relative;
+  background: #fff; /* fallback background */
+}
+
+/* Remove outline on focus */
+.checkbox-wrapper-12 input[type="checkbox"]:focus {
+  outline: 0;
+}
+
+/* Style the label (the circle background) */
+.checkbox-wrapper-12 .cbx label {
+  width: 24px;
+  height: 24px;
+  background: none;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, 0, 0);
+  pointer-events: none; /* prevent label from blocking checkbox */
+}
+
+/* Style the SVG checkmark */
+.checkbox-wrapper-12 .cbx svg {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Animate checkmark stroke */
+.checkbox-wrapper-12 .cbx svg path {
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 19;
+  stroke-dashoffset: 19;
+  transition: stroke-dashoffset 0.3s ease;
+  transition-delay: 0.2s;
+}
+
+/* Show checkmark on checked state */
+.checkbox-wrapper-12 .cbx input:checked + label {
+  animation: splash-12 0.6s ease forwards;
+}
+
+.checkbox-wrapper-12 .cbx input:checked + label + svg path {
+  stroke-dashoffset: 0;
+}
+
+/* Optional: Keyframes for splash animation (already provided) */
+@-moz-keyframes splash-12 {
+  40% {
+    background: #3e5f1b;
+    box-shadow: 0 -18px 0 -8px #3e5f1b, 16px -8px 0 -8px #3e5f1b, 16px 8px 0 -8px #3e5f1b, 0 18px 0 -8px #3e5f1b, -16px 8px 0 -8px #3e5f1b, -16px -8px 0 -8px #3e5f1b;
+  }
+  100% {
+    background: #3e5f1b;
+    box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+  }
+}
+
+@-webkit-keyframes splash-12 {
+  40% {
+    background: #3e5f1b;
+    box-shadow: 0 -18px 0 -8px #3e5f1b, 16px -8px 0 -8px #3e5f1b, 16px 8px 0 -8px #3e5f1b, 0 18px 0 -8px #3e5f1b, -16px 8px 0 -8px #3e5f1b, -16px -8px 0 -8px #3e5f1b;
+  }
+  100% {
+    background: #3e5f1b;
+    box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+  }
+}
+
+@-o-keyframes splash-12 {
+  40% {
+    background: #3e5f1b;
+    box-shadow: 0 -18px 0 -8px #3e5f1b, 16px -8px 0 -8px #3e5f1b, 16px 8px 0 -8px #3e5f1b, 0 18px 0 -8px #3e5f1b, -16px 8px 0 -8px #3e5f1b, -16px -8px 0 -8px #3e5f1b;
+  }
+  100% {
+    background: #3e5f1b;
+    box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+  }
+}
+
+@keyframes splash-12 {
+  40% {
+    background: #3e5f1b;
+    box-shadow: 0 -18px 0 -8px #3e5f1b, 16px -8px 0 -8px #3e5f1b, 16px 8px 0 -8px #3e5f1b, 0 18px 0 -8px #3e5f1b, -16px 8px 0 -8px #3e5f1b, -16px -8px 0 -8px #3e5f1b;
+  }
+  100% {
+    background: #3e5f1b;
+    box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+  }
+}
+
+
+     /* CSS Button Generate*/
+.btn-generate {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  border-width: 0;
+  padding: 0 8px 12px;
+  min-width: 10em;
+  box-sizing: border-box;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.button-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 0;
+  padding: 8px 16px;
+  transform: translateY(0);
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 -1px rgba(0, 0, 0, .25);
+  transition-property: transform;
+  transition-duration: .2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn-generate:active .button-top {
+  transform: translateY(6px);
+}
+
+.button-top::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+  box-sizing: content-box;
+  background-image: radial-gradient(#3e5f1b, #276e1f);
+  text-align: center;
+  color: #fff;
+  box-shadow: inset 0 0 0px 1px rgba(255, 255, 255, .2), 0 1px 2px 1px rgba(255, 255, 255, .2);
+  transition-property: border-radius, padding, width, transform;
+  transition-duration: .2s;
+}
+
+.btn-generate:active .button-top::after {
+  border-radius: 6px;
+  padding: 0 2px;
+}
+
+.button-bottom {
+  position: absolute;
+  z-index: -1;
+  bottom: 4px;
+  left: 4px;
+  border-radius: 8px / 16px 16px 8px 8px;
+  padding-top: 6px;
+  width: calc(100% - 8px);
+  height: calc(100% - 10px);
+  box-sizing: content-box;
+  background-color: 
+  background-image: radial-gradient(4px 8px at 4px calc(100% - 8px), rgba(255, 255, 255, .25), transparent), radial-gradient(4px 8px at calc(100% - 4px) calc(100% - 8px), rgba(255, 255, 255, .25), transparent), radial-gradient(16px at -4px 0, white, transparent), radial-gradient(16px at calc(100% + 4px) 0, white, transparent);
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5), inset 0 -1px 3px 3px rgba(0, 0, 0, .4);
+  transition-property: border-radius, padding-top;
+  transition-duration: .2s;
+}
+
+.btn-generate:active .button-bottom {
+  border-radius: 10px 10px 8px 8px / 8px;
+  padding-top: 0;
+}
+
+.button-base {
+  position: absolute;
+  z-index: -2;
+  top: 4px;
+  left: 0;
+  border-radius: 12px;
+  width: 100%;
+  height: calc(100% - 4px);
+  background-color: rgba(0, 0, 0, .15);
+  box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .75), inset 0 2px 2px rgba(0, 0, 0, .25);
+}
+.generate-container {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    padding-bottom: 20px;
+    /* This line tells the container to stretch across all grid columns */
+    grid-column: 1 / -1; 
+}
+
+/* Add this to ensure the button behaves like a centered text element */
+.btn-generate {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.logo-animate {
+    width: auto;
+    height: 100px;
+    margin-bottom: 60px; /* Reduced slightly for better layout balance */
+    opacity: 0.8;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth 'pop' effect */
+    cursor: pointer;
+}
+
+.logo-animate:hover {
+    opacity: 1;
+    transform: scale(1.5); /* Slightly enlarges the logo */
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6)); /* Subtle glow */
+}
+
+
+        .placeholder {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Video background element -->
+    <video id="video-background" autoplay muted loop playsinline>
+        <source src="bg-plexus.mp4" type="video/mp4" />
+    </video>
+
+    <div class="container">
+        <!-- Logo -->
+        <img src="chase-r.png" alt="Chase" class="logo-animate" style="width:auto; height:100px; margin-bottom:100px; opacity:0.8;">
+
+        <!-- Result Box -->
+        <div class="result-container placeholder" id="passwordResult">Generate Password</div>
+
+        <div class="setting-title">Password Length</div>
+
+        <!-- Slider -->
+        <div class="slider-wrapper">
+            <span>4</span>
+            <input type="range" id="lengthSlider" min="4" max="32" value="16" />
+            <span>32</span>
+        </div>
+        <span class="length-val" id="lengthValue">16</span>
+
+
+
+        <!-- Options -->
+        <div class="options-grid">
+            <div class="option">
+    <span>Capital Crusade</span>
+    <div class="checkbox-wrapper-12">
+      <div class="cbx">
+        <input type="checkbox" id="uppercase" unchecked />
+        <label for="uppercase"></label>
+        <svg fill="none" viewBox="0 0 15 14" height="14" width="15">
+          <path d="M2 8.36364L6.23077 12L13 2"></path>
+        </svg>
+      </div>
+    </div>
+</div>
+
+<div class="option">
+    <span>Numeric Nonsense</span>
+    <div class="checkbox-wrapper-12">
+      <div class="cbx">
+        <input type="checkbox" id="numbers" unchecked />
+        <label for="numbers"></label>
+        <svg fill="none" viewBox="0 0 15 14" height="14" width="15">
+          <path d="M2 8.36364L6.23077 12L13 2"></path>
+        </svg>
+      </div>
+    </div>
+</div>
+
+<div class="option">
+    <span>Lowercase Lads</span>
+    <div class="checkbox-wrapper-12">
+      <div class="cbx">
+        <input type="checkbox" id="lowercase" unchecked />
+        <label for="lowercase"></label>
+        <svg fill="none" viewBox="0 0 15 14" height="14" width="15">
+          <path d="M2 8.36364L6.23077 12L13 2"></path>
+        </svg>
+      </div>
+    </div>
+</div>
+
+<div class="option">
+    <span>Symbol Shenanigans</span>
+    <div class="checkbox-wrapper-12">
+      <div class="cbx">
+        <input type="checkbox" id="symbols" unchecked />
+        <label for="symbols"></label>
+        <svg fill="none" viewBox="0 0 15 14" height="14" width="15">
+          <path d="M2 8.36364L6.23077 12L13 2"></path>
+        </svg>
+      </div>
+    </div>
+</div>
+
+<!-- Centered Generate Button -->
+<div class="generate-container">
+    <button class="btn-generate" id="generateBtn">
+        <div class="button-top">Generate Password</div>
+        <div class="button-bottom"></div>
+        <div class="button-base"></div>
+    </button>
+</div>
+
+
+
+    <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    let titleText = "Chase Password Generator ";
+    let index = 0;
+    let direction = 1; // 1 for moving forward, -1 for moving backward
+
+    function updateTitle() {
+      // Create a moving substring
+      let displayText;
+      
+      if (direction === 1) {
+        displayText = titleText.substring(0, index + 1);
+        index++;
+        if (index >= titleText.length - 1) {
+          direction = -1;
+        }
+      } else {
+        displayText = titleText.substring(0, index);
+        index--;
+        if (index <= 0) {
+          direction = 1;
+        }
+      }
+      
+      document.title = displayText;
+    }
+
+    // Update the title every 250 milliseconds
+    setInterval(updateTitle, 250);
+  });
+        // Elements
+        const resultEl = document.getElementById('passwordResult');
+        const lengthEl = document.getElementById('lengthSlider');
+        const lengthValEl = document.getElementById('lengthValue');
+        const uppercaseEl = document.getElementById('uppercase');
+        const lowercaseEl = document.getElementById('lowercase');
+        const numbersEl = document.getElementById('numbers');
+        const symbolsEl = document.getElementById('symbols');
+        const generateBtn = document.getElementById('generateBtn');
+
+        // Generation functions
+        const randomFunc = {
+            lower: () => String.fromCharCode(Math.floor(Math.random() * 26) + 97),
+            upper: () => String.fromCharCode(Math.floor(Math.random() * 26) + 65),
+            number: () => String.fromCharCode(Math.floor(Math.random() * 10) + 48),
+            symbol: () => {
+                const symbols = "!@#$%^&*(){}[]=<>/,.";
+                return symbols[Math.floor(Math.random() * symbols.length)];
+            }
+        };
+
+        // Update Slider UI
+        lengthEl.addEventListener('input', () => {
+            lengthValEl.innerText = lengthEl.value;
+        });
+
+        // Click to Copy
+        resultEl.addEventListener('click', () => {
+            const password = resultEl.innerText;
+            if (!password || password === "Generate Password") return;
+
+            navigator.clipboard.writeText(password).then(() => {
+                const originalText = password;
+                resultEl.innerText = "Copied!";
+                resultEl.style.color = "#3e5f1b";
+                setTimeout(() => {
+                    resultEl.innerText = originalText;
+                    resultEl.style.color = "var(--dark-blue)";
+                }, 1000);
+            });
+        });
+
+        // Generate Logic
+        generateBtn.addEventListener('click', () => {
+            const length = +lengthEl.value;
+            const hasLower = lowercaseEl.checked;
+            const hasUpper = uppercaseEl.checked;
+            const hasNumber = numbersEl.checked;
+            const hasSymbol = symbolsEl.checked;
+
+            resultEl.innerText = generatePassword(hasLower, hasUpper, hasNumber, hasSymbol, length);
+            resultEl.classList.remove('placeholder');
+        });
+
+        function generatePassword(lower, upper, number, symbol, length) {
+            let generatedPassword = '';
+            const typesCount = lower + upper + number + symbol;
+            const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(item => Object.values(item)[0]);
+
+            if (typesCount === 0) return 'Select Options First';
+
+            for (let i = 0; i < length; i += typesCount) {
+                typesArr.forEach(type => {
+                    const funcName = Object.keys(type)[0];
+                    generatedPassword += randomFunc[funcName]();
+                });
+            }
+
+            return generatedPassword.split('').sort(() => 0.5 - Math.random()).join('').slice(0, length);
+        }
+
+        // Security listeners
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            const forbiddenKeys = ['F11', 'F12'];
+            if (forbiddenKeys.includes(e.key)) e.preventDefault();
+            if (e.ctrlKey && ['u', 's', 'i'].includes(e.key.toLowerCase())) e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>
